@@ -7,5 +7,8 @@ urlpatterns = [
 
     path('login',views.login),
     # Users
-    path('users/all',views.usersList)
+    path('users/all',views.usersList),
+
+    # Projects
+    path('projects/user/<id>',views.projectsUsuario),
 ]

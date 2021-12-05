@@ -49,3 +49,12 @@ def login(request):
     token, created = Token.objects.get_or_create(user=user)
     print(token.key)
     return Response(token.key)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def projectsUsuario(request, id):
+    # Search user
+    # Search projects by user
+    # Serializer data
+    # Return that data
+    return Response(id, status=status.HTTP_200_OK)
