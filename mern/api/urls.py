@@ -10,5 +10,9 @@ urlpatterns = [
     path('users/all',views.usersList),
 
     # Projects
-    path('projects/user/<id>',views.projectsUsuario),
+    path('projects/user/<id>',views.projectsUsuario, name='Projectslist'),
+    path('projects/get/<id>',views.projectsGet, name='ProjectGet'),
+    path('projects/create/',views.projectsCreate, name='ProjectStore'),
+    path('projects/update/<id>',views.projectsUpdate, name='ProjectUpdate'),
+    path('projects/delete/<id>',views.projectsDelete, name='ProjectDelete'),
 ]
