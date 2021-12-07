@@ -64,12 +64,55 @@ def projectsUsuario(request, id):
     # Return that data
     return Response(serializer.data, status=status.HTTP_200_OK)
 
+# CRUD usuarios
+
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
-def projectsGet(request, id):
-    project = Proyecto.objects.get(id=id)
-    serializer = ProyectoSerializer(project, many=False)
+def usersGet(request, id):
+    try:
+        user = User.objects.get(id=id)
+        serializer = UserSerializer(user, many=False)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    except User.DoesNotExist:
+        return Response({'detail': 'Usuario no encontrado', 'exception':None}, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def usersCreate(request):
+    serializer = UserSerializer(data=request.data)
+
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    else:
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def usersUpdate(request, id):
+    try:
+        user = User.objects.get(id=id)
+    except User.DoesNotExist:
+        return Response({'detail': 'Usuario no encontrado', 'exception': None}, status=status.HTTP_400_BAD_REQUEST)
+    serializer = UserSerializer(instance=user, data=request.data)
+
+    if serializer.is_valid():
+        serializer.save()
+
     return Response(serializer.data, status=status.HTTP_200_OK)
+
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def usersDelete(request, id):
+    try:
+        user = User.objects.get(id=id)
+    except User.DoesNotExist:
+        return Response({'detail': 'Usuario no encontrado', 'exception': None}, status=status.HTTP_400_BAD_REQUEST)
+    user.delete()
+
+    return Response({'detail':'Usuario eliminado'}, status=status.HTTP_200_OK)
+
+# CRUD proyectos
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
@@ -115,19 +158,3 @@ def projectsDelete(request, id):
     project.delete()
 
     return Response({'detail':'Proyecto eliminado'}, status=status.HTTP_200_OK)
-
-'''
-@api_view(['POST'])
-@permission_classes([IsAuthenticated])
-def projectCreate(request):
-    if request.method == 'POST':
-        formaPersona = PersonaForm(request.POST)
-        # Validar formulario
-        if formaPersona.is_valid():
-            formaPersona.save()
-            return redirect('index')
-    else:
-        formaPersona = PersonaForm()
-    return render(request, 'personas/nuevo.html', {
-        'formaPersona':formaPersona,
-    })'''

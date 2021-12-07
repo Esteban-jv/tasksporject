@@ -9,6 +9,13 @@ urlpatterns = [
     # Users
     path('users/all',views.usersList),
 
+    # Users
+    path('users/',views.usersList, name='Userslist'),
+    path('users/get/<id>',views.usersGet, name='UsersGet'),
+    path('users/create/',views.usersCreate, name='Userstore'),
+    path('users/update/<id>',views.usersUpdate, name='UsersUpdate'),
+    path('users/delete/<id>',views.usersDelete, name='UsersDelete'),
+
     # Projects
     path('projects/user/<id>',views.projectsUsuario, name='Projectslist'),
     path('projects/get/<id>',views.projectsGet, name='ProjectGet'),
