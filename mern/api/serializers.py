@@ -8,6 +8,8 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ['id','username','email','is_active']
 
 class ProyectoSerializer(serializers.ModelSerializer):
+    # user = UserSerializer()
+    user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
     class Meta:
         model = Proyecto
         fields = '__all__'
