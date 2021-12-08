@@ -22,4 +22,11 @@ urlpatterns = [
     path('projects/create/',views.projectsCreate, name='ProjectStore'),
     path('projects/update/<id>',views.projectsUpdate, name='ProjectUpdate'),
     path('projects/delete/<id>',views.projectsDelete, name='ProjectDelete'),
+
+    # Tasks
+    path('tasks/project/<id>',views.tasksProject, name='Taskslist'),
+    path('tasks/get/<id>',views.tasksGet, name='tasksGet'),
+    path('tasks/create/',views.tasksCreate, name='tasksCreate'),
+    path('tasks/update/<id>',views.tasksUpdate, name='tasksUpdate'),
+    path('tasks/delete/<id>',views.tasksDelete, name='tasksDelete'),
 ]

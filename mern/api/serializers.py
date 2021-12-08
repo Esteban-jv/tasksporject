@@ -8,13 +8,13 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ['id','username','email','is_active']
 
 class ProyectoSerializer(serializers.ModelSerializer):
-    # user = UserSerializer()
     user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
     class Meta:
         model = Proyecto
         fields = '__all__'
 
 class TareaSerializer(serializers.ModelSerializer):
+    proyecto = serializers.PrimaryKeyRelatedField(queryset=Proyecto.objects.all())
     class Meta:
         model = Tarea
         fields = '__all__'

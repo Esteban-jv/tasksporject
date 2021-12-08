@@ -158,3 +158,61 @@ def projectsDelete(request, id):
     project.delete()
 
     return Response({'detail':'Proyecto eliminado'}, status=status.HTTP_200_OK)
+
+# CRUD tareas
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def tasksProject(request, id):
+    # Search project
+    # Search tasks by project
+    tasks = Tarea.objects.all()
+    serializer = TareaSerializer(tasks, many=True)
+    # Serializer data
+    # Return that data
+    return Response(serializer.data, status=status.HTTP_200_OK)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def tasksGet(request, id):
+    try:
+        tarea = Tarea.objects.get(id=id)
+        serializer = TareaSerializer(tarea, many=False)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    except Tarea.DoesNotExist:
+        return Response({'detail': 'Tarea no encontrada', 'exception':None}, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def tasksCreate(request):
+    serializer = TareaSerializer(data=request.data)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    else:
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def tasksUpdate(request, id):
+    try:
+        tarea = Tarea.objects.get(id=id)
+    except Tarea.DoesNotExist:
+        return Response({'detail': 'Tarea no encontrada', 'exception': None}, status=status.HTTP_400_BAD_REQUEST)
+    serializer = TareaSerializer(instance=tarea, data=request.data)
+
+    if serializer.is_valid():
+        serializer.save()
+
+    return Response(serializer.data, status=status.HTTP_200_OK)
+
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def tasksDelete(request, id):
+    try:
+        tarea = Tarea.objects.get(id=id)
+    except Tarea.DoesNotExist:
+        return Response({'detail': 'tarea no encontrada', 'exception': None}, status=status.HTTP_400_BAD_REQUEST)
+    tarea.delete()
+
+    return Response({'detail':'Tarea eliminada'}, status=status.HTTP_200_OK)

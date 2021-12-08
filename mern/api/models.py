@@ -13,7 +13,7 @@ class Proyecto(models.Model):
 
 # Tareas model
 class Tarea(models.Model):
-    nombre = models.CharField(max_length=200, default='') # Needs to take default out of here
+    nombre = models.CharField(max_length=200, null=False) # Needs to take default out of here
     completed = models.BooleanField(default=False)
     proyecto = models.ForeignKey(Proyecto, on_delete=models.DO_NOTHING, null=False)
 
