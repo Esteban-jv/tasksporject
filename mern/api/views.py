@@ -57,7 +57,7 @@ def login(request):
 def projectsUsuario(request, id):
     # Search user
     # Search projects by user
-    projects = Proyecto.objects.all()
+    projects = Proyecto.objects.filter(user_id=id)
     serializer = ProyectoSerializer(projects, many=True)
     # print(projects,serializer)
     # Serializer data
@@ -164,12 +164,8 @@ def projectsDelete(request, id):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def tasksProject(request, id):
-    # Search project
-    # Search tasks by project
-    tasks = Tarea.objects.all()
+    tasks = Tarea.objects.filter(proyecto_id=id)
     serializer = TareaSerializer(tasks, many=True)
-    # Serializer data
-    # Return that data
     return Response(serializer.data, status=status.HTTP_200_OK)
 
 @api_view(['GET'])
