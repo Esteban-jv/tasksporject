@@ -6,6 +6,8 @@ urlpatterns = [
     # path('model-list/', views.modelsList, name="api-overview")
 
     path('login',views.login),
+    path('createaccounnt/',views.usersCreateSimple),
+    path('logout',views.ulogout),
     # Users
     path('users/all',views.usersList),
 

@@ -11,7 +11,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import permission_classes
 from rest_framework import status
 
-from django.core.exceptions import ObjectDoesNotExist
+from django.forms.models import model_to_dict
 
 # Create your views here.
 @api_view(['GET'])
@@ -35,6 +35,7 @@ def usersList(request):
 
 @api_view(['POST'])
 def login(request):
+    print(request.data)
 
     username = request.data.get('username','')
     password = request.data.get('password')
@@ -42,15 +43,19 @@ def login(request):
     try:
         user = User.objects.get(username=username)
     except User.DoesNotExist:
-        return Response(f'No existe una cuenta para {username}',status=status.HTTP_401_UNAUTHORIZED)
+        return Response({'msg': f'No existe una cuenta para {username}', 'exception':None},status=status.HTTP_401_UNAUTHORIZED)
 
     pwd_valid = check_password(password,user.password)
     if not pwd_valid:
-        return Response('Contraseña incorrecta',status=status.HTTP_401_UNAUTHORIZED)
+        return Response({'msg': 'Contraseña incorrecta', 'exception':None},status=status.HTTP_401_UNAUTHORIZED)
+
 
     token, created = Token.objects.get_or_create(user=user)
-    print(token.key)
-    return Response(token.key)
+    user.password = None
+    return Response({
+        'token': token.key,
+        'user': model_to_dict(user)
+    }, status=status.HTTP_202_ACCEPTED)
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
@@ -86,6 +91,37 @@ def usersCreate(request):
         return Response(serializer.data, status=status.HTTP_200_OK)
     else:
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+@api_view(['POST'])
+def usersCreateSimple(request):
+    serializer = UserSerializer(data=request.data)
+    data = serializer.initial_data
+    # print(data)
+    data['first_name'] = request.data.get('nombre') # Custom fields
+    data['last_name'] = request.data.get('apellidos') # Custom fields
+    if serializer.is_valid():
+        serializer.save()
+        username = request.data.get('username')
+        try:
+            user = User.objects.get(username=username) #.values_list('username','email','first_name','last_name')
+            token, created = Token.objects.get_or_create(user=user)
+            user.password = None
+            # print(token.key)
+            return Response({
+                'token':token.key,
+                'user':model_to_dict(user)
+            }, status=status.HTTP_202_ACCEPTED)
+        except User.DoesNotExist:
+            return Response({
+                'msg':'Error al intentar iniciar la sesión',
+                'details': f'No existe una cuenta para {username}'
+            }, status=status.HTTP_401_UNAUTHORIZED)
+        # return Response(serializer.data, status=status.HTTP_200_OK)
+    else:
+        return Response({
+            'msg':'Error al intentar crear la cuenta',
+            'details': serializer.errors
+        }, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -212,3 +248,12 @@ def tasksDelete(request, id):
     tarea.delete()
 
     return Response({'detail':'Tarea eliminada'}, status=status.HTTP_200_OK)
+
+@api_view(['GET'])
+def ulogout(request):
+    try:
+        request.user.auth_token.delete()
+        # logout(request)
+        return Response({'detail':'Se ha terminado la sesión'}, status=status.HTTP_200_OK)
+    except User.DoesNotExist:
+        return Response({'detail': 'Usuario no encontrado', 'exception':None}, status=status.HTTP_400_BAD_REQUEST)

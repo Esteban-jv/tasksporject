@@ -5,7 +5,14 @@ from .models import Proyecto, Tarea # Or just the models you need
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['id','username','email','is_active']
+        fields = ['id','first_name','last_name','username','password','email','is_active']
+
+    def create(self, validated_data):
+        user = super().create(validated_data)
+        user.set_password(validated_data['password'])
+        # last_login = some_python_var # Must be now by default
+        user.save()
+        return user
 
 class ProyectoSerializer(serializers.ModelSerializer):
     user = serializers.PrimaryKeyRelatedField(queryset=User.objects.all())
